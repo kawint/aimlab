@@ -19,7 +19,7 @@ class Flower extends Group {
         // Load object
         const loader = new GLTFLoader();
 
-        this.name = 'flower';
+        this.name = 'm4a1';
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
         });

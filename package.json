@@ -1,17 +1,17 @@
 {
-  "name": "lower-case-dashed-name-of-project",
-  "repository": "REPOSITORY-NAME-AS-IT-APPEARS-IN-GITHUB-URL",
+  "name": "aim-lab",
+  "repository": "COS426_Final_Project",
   "version": "0.1.0",
-  "title": "PROJECT TITLE HERE",
-  "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+  "title": "COS426: Aim Lab",
+  "description": "Minimal version of aimlab.gg",
   "keywords": [
     "Princeton",
     "graphics",
     "three.js",
     "COS 426",
     "ivy league",
-    "keyword1",
-    "keyword2",
+    "fps",
+    "aimlab",
     "...",
     "this last entry CANNOT have a comma after it ->"
   ],

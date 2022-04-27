@@ -1,0 +1,11 @@
+Model Information:
+* title:	AK-47 Assault rifle
+* source:	https://sketchfab.com/3d-models/ak-47-assault-rifle-948f6b1beeb749759b91bf1d5a6db481
+* author:	Nneako (https://sketchfab.com/nickolasa.mcintosh)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "AK-47 Assault rifle" (https://sketchfab.com/3d-models/ak-47-assault-rifle-948f6b1beeb749759b91bf1d5a6db481) by Nneako (https://sketchfab.com/nickolasa.mcintosh) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
