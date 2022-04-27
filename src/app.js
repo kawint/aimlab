@@ -44,6 +44,10 @@ class Initializer {
       const instersections = raycaster.intersectObject(ball, false);
       if (instersections[0] != undefined) {
           if (instersections[0].object.uuid === sphere.uuid) {
+              let el = document.getElementById("box1");
+              const arr = el.textContent.split(" ");
+              let currScore = parseInt(arr[1]);
+              el.innerText = arr[0] + " " + (++currScore);
               scene.remove(sphere);
               sphere.position.set(Math.random()*10, Math.random()*5, Math.random()*10); 
               scene.add(sphere);
@@ -223,9 +227,23 @@ class Initializer {
   }
 }
 
-
 let _APP = null;
 
+function box_stuff() {
+  let html = " <div id='box1'>Score: 0</div>";
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  document.body.appendChild(div);
+  const el = document.getElementById("box1");
+  el.style.backgroundColor = "green";
+  el.style.position = "absolute";
+  el.style.width = 200+'px';
+  el.style.height = 100+'px';
+  el.style.left = 500+'px';
+  el.style.top = 50+'px';
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  box_stuff();
   _APP = new Initializer();
 });
