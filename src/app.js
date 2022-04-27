@@ -27,13 +27,13 @@ class Initializer {
     const geometry = new THREE.SphereGeometry(); // (radius, widthSegments, heightSegments)
     const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
     var sphere = new THREE.Mesh(geometry, material);
-    sphere.position.set(0, 0, 0);
+    sphere.position.set(3, 2, 0);
     this.scene_.add(sphere);
     let ball = sphere;
     const raycaster = new Raycaster();
     const mouse = new Vector2(0, 0);
-    console.log(this.camera_);
-    console.log(this.scene_);
+    // console.log(this.camera_);
+    // console.log(this.scene_);
     let cam = this.camera_;
     let scene = this.scene_;
 
@@ -45,7 +45,7 @@ class Initializer {
       if (instersections[0] != undefined) {
           if (instersections[0].object.uuid === sphere.uuid) {
               scene.remove(sphere);
-              sphere.position.set(Math.random()*5, Math.random()*5, 0); 
+              sphere.position.set(Math.random()*10, Math.random()*5, Math.random()*10); 
               scene.add(sphere);
               ball = sphere;
           }
