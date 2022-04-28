@@ -19,9 +19,9 @@ class fpsCamera {
     this.rotation_ = new THREE.Quaternion();
     this.translation_ = new THREE.Vector3(0, 2, 0);
     this.phi_ = 0;
-    this.phiSpeed_ = 8;
+    this.phiSpeed_ = 5;
     this.theta_ = 0;
-    this.thetaSpeed_ = 5;
+    this.thetaSpeed_ = 3;
     this.headBobActive_ = false;
     this.headBobTimer_ = 0;
     this.objects_ = objects;

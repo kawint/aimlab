@@ -3,9 +3,7 @@ import { Scene, Color } from 'three';
 
 import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
 import { fpsCamera } from './components/camera';
-import { WebGLRenderer, PerspectiveCamera, Vector3, Vector2, Raycaster } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { SeedScene } from 'scenes';
+import { Vector3, Vector2, Raycaster } from 'three';
 
 class Initializer {
   constructor() {
@@ -85,8 +83,8 @@ class Initializer {
     const near = 1.0;
     const far = 1000.0;
     this.camera_ = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    this.camera_.position.set(0, 2, 0);
-    this.camera_.lookAt(new Vector3(0, 0, 0));
+    this.camera_.position.set(6, 3,-10);
+    this.camera_.lookAt(new Vector3(100, 0, 0));
 
     this.scene_ = new THREE.Scene();
 
@@ -227,8 +225,6 @@ class Initializer {
   }
 }
 
-let _APP = null;
-
 function box_stuff() {
   let html = " <div id='box1'>Score: 0</div>";
   const div = document.createElement("div");
@@ -243,7 +239,38 @@ function box_stuff() {
   el.style.top = 50+'px';
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  box_stuff();
-  _APP = new Initializer();
+let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
+<link href='https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'> <div id='instructions'> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: Montserrat, sans-serif; font-style: italic;'>AIM LAB</span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: bold; font-family: Montserrat, sans-serif; font-style: italic;'>Enter to play !!</span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: Montserrat, sans-serif; font-style: italic;'>Move: WASD, Jump: SPACE, Look: MOUSE</span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: Montserrat, sans-serif; font-style: italic;'>Shooting: LEFT CLICK</span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+</div>"
+const div = document.createElement("div");
+div.id = "startDiv";
+div.innerHTML = html;
+document.body.appendChild(div);
+
+let _APP = null;
+
+
+window.addEventListener("keydown", event => { 
+  if (event.key == "Enter") {
+    div.remove();
+    _APP = new Initializer();
+    box_stuff();
+  }
 });
