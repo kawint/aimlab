@@ -35,22 +35,35 @@ class Initializer {
     let cam = this.camera_;
     let scene = this.scene_;
 
+    let num_hit = 0;
+    let total = 0;
+    // let audio = new Audio('src/resources/break.mp3');
+    let audio = new Audio('src/resources/break2.mp3');
+
     window.addEventListener('click', function(event) {
+      total++;
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, cam);
       const instersections = raycaster.intersectObject(ball, false);
       if (instersections[0] != undefined) {
           if (instersections[0].object.uuid === sphere.uuid) {
-              let el = document.getElementById("box1");
-              const arr = el.textContent.split(" ");
-              let currScore = parseInt(arr[1]);
-              el.innerText = arr[0] + " " + (++currScore);
+              audio.play();
+              let el = document.getElementById("points");
+              let currScore = parseInt(el.innerHTML);
+              el.innerHTML = ++currScore;
+              let accuracy = (100*(++num_hit) / total).toFixed(2);
+              el = document.getElementById("accuracy");
+              el.innerHTML = accuracy;
               scene.remove(sphere);
               sphere.position.set(Math.random()*10, Math.random()*5, Math.random()*10); 
               scene.add(sphere);
               ball = sphere;
           }
+      } else {
+        let accuracy = (100 * num_hit / total).toFixed(2);
+        let el = document.getElementById("accuracy");
+        el.innerHTML = accuracy;
       }
     });
   }
@@ -225,34 +238,35 @@ class Initializer {
   }
 }
 
-function box_stuff() {
-  let html = " <div id='box1'>Score: 0</div>";
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  document.body.appendChild(div);
-  const el = document.getElementById("box1");
-  el.style.backgroundColor = "green";
-  el.style.position = "absolute";
-  el.style.width = 200+'px';
-  el.style.height = 100+'px';
-  el.style.left = 500+'px';
-  el.style.top = 50+'px';
-}
+// function box_stuff() {
+//   let html = " <div id='box1'>Score: 0</div>";
+//   const div = document.createElement("div");
+//   div.innerHTML = html;
+//   document.body.appendChild(div);
+//   const el = document.getElementById("box1");
+//   el.style.backgroundColor = "green";
+//   el.style.position = "absolute";
+//   el.style.width = 200+'px';
+//   el.style.height = 100+'px';
+//   el.style.left = 500+'px';
+//   el.style.top = 50+'px';
+// }
 
+// old font: Montserrat -- I changed the font to match the scoreboard but I don't care what font we use haha
 let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
-<link href='https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'> <div id='instructions'> \
+<link href='https://fonts.googleapis.com/css2?family=courier:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'> <div id='instructions'> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: Montserrat, sans-serif; font-style: italic;'>AIM LAB</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>AIM LAB</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: bold; font-family: Montserrat, sans-serif; font-style: italic;'>Enter to play !!</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: Montserrat, sans-serif; font-style: italic;'>Move: WASD, Jump: SPACE, Look: MOUSE</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Move: WASD, Jump: SPACE, Look: MOUSE</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: Montserrat, sans-serif; font-style: italic;'>Shooting: LEFT CLICK</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Shoot: LEFT CLICK</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
@@ -264,13 +278,78 @@ div.id = "startDiv";
 div.innerHTML = html;
 document.body.appendChild(div);
 
+function init_scoreBoard() {
+  // let html = " <div id='score'>Score: 0 <br> Accuracy: -- %</div>";
+  let html = " <div id='top'><div id='score'>PTS</div><div id='points'>0</div><div id='accuracy'> -- </div><div id='percent'>%</div></div>";
+  let div = document.createElement("div");
+  div.innerHTML = html;
+  document.body.appendChild(div);
+  
+  let el = document.getElementById("top");
+  el.style.position = "absolute";
+  el.style.left = 50+'%';
+  el.style.top = 15+'px'; // style='position: absolute; left:'50'%; top='15'px;
+  
+  el = document.getElementById("score");
+  el.style.backgroundColor = "green";
+  el.style.color = "white";
+  el.style.fontFamily = "courier";
+  el.style.fontSize = 150+"%"
+  el.style.opacity = 0.6;  
+  el.style.position = "absolute";
+  el.style.width = 80+'px';
+  el.style.height = 50+'px';
+  el.style.lineHeight = 50+'px';
+  el.style.textAlign = "center";
+  el.style.left = -180+'px';
+  el.style.top = 15+'px';
+  el = document.getElementById("points");
+  el.style.backgroundColor = "green";
+  el.style.color = "white";
+  el.style.fontFamily = "courier";
+  el.style.fontSize = 150+"%";
+  el.style.position = "absolute";
+  el.style.width = 100 +'px';
+  el.style.height = 50 +'px';
+  el.style.lineHeight = 50+'px';
+  el.style.textAlign = "center";
+  el.style.left = -100+'px';
+  el.style.top = 15+'px';
+  el = document.getElementById("accuracy");
+  el.style.backgroundColor = "white";
+  el.style.color = "green";
+  el.style.fontFamily = "courier";
+  el.style.fontSize = 150+"%"
+  el.style.position = "absolute";
+  el.style.width = 100+'px';
+  el.style.height = 50+'px';
+  el.style.lineHeight = 50+'px';
+  el.style.textAlign = "center";
+  el.style.left = 0+'px';
+  el.style.top = 15+'px';
+  el = document.getElementById("percent");
+  el.style.backgroundColor = "white";
+  el.style.color = "green";
+  el.style.fontFamily = "courier";
+  el.style.fontSize = 150+"%";
+  el.style.opacity = 0.6;    
+  el.style.position = "absolute";
+  el.style.width = 80 +'px';
+  el.style.height = 50 +'px';
+  el.style.lineHeight = 50+'px';
+  el.style.textAlign = "center";
+  el.style.left = 100+'px';
+  el.style.top = 15+'px';
+}
+
 let _APP = null;
 
 
 window.addEventListener("keydown", event => { 
   if (event.key == "Enter") {
     div.remove();
+    init_scoreBoard();
     _APP = new Initializer();
-    box_stuff();
+    // box_stuff();
   }
 });
