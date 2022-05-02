@@ -395,7 +395,7 @@ class Initializer {
   animateHTML(time) {
   if (ANIMATE_END) {
     let opac = 0.4 * Math.sin(time / 500) + 0.6;
-      document.getElementById('endEnter').style.opacity = opac;
+    document.getElementById('endEnter').style.opacity = opac;
     }
   }
 
@@ -446,21 +446,20 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>AIM LAB</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; '>Move: WASD, Look: MOUSE</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Shoot: LEFT CLICK</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-weight: bold;'>INSTRUCTIONS:</span></div> \
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>stuff explaining the game...</span></div> \
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Enter the number of rounds u want!</span></div> \
-<div style='background:DarkCyan;text-align: center;'><input id='num'></input></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><input id='num' style='height:25px; width:50px;border: 3px solid; border-radius: 10px; font-size:1.5em; font-family: courier, sans-serif;'></input></div> \
 <div style='background:DarkCyan;text-align: center;'><span id='error' style='color:red;font-size:6em; font-weight: bold;'></span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span id ='startEnter' style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
 <div style='background-color:DarkCyan;color:lightgray;margin=0px;height=1000px'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
