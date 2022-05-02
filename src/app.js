@@ -6,7 +6,13 @@ import { fpsCamera } from './components/camera';
 import { Vector3, Vector2, Raycaster } from 'three';
 
 const NUM_SPLIT = 4;
-const TOTAL = 5;
+const TOTAL = 2;
+const MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
+const THIRTY_DEG = Math.PI/6;
+
+// TODO
+// 1) add instructions to start page
+// 2) update the ball generation position based on obstacle position
 
 class Initializer {
   constructor() {
@@ -32,18 +38,26 @@ class Initializer {
 
     if (instersection[0] != undefined) {
       if (instersection[0].object.uuid === ball.uuid) {
-        return true;
+        let camPos = this.camera_.position;
+        let interPos = instersection[0].point;
+        let center = ball.position;
+
+        let toCam = new THREE.Vector3().copy(camPos).sub(ball.position).normalize();
+        let toInter = new THREE.Vector3().copy(interPos).sub(ball.position).normalize();
+    
+        if (Math.acos(toCam.dot(toInter)) < THIRTY_DEG) return [true, true];
+        return [true, false];
       }
     }
 
-    return false;
+    return [false, null];
   }
 
   makeNewBigBall() {
     const BIG_R = 1;
 
     const geometry = new THREE.SphereGeometry(BIG_R, 64, 32);
-    const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+    const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
     let newBall = new THREE.Mesh(geometry, material);
 
     return newBall;
@@ -67,7 +81,7 @@ class Initializer {
     pos[3] = [negX, negY, z];
 
     const geometry = new THREE.SphereGeometry(SMALL_R, 64, 32);
-    const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+    const material = new THREE.MeshPhongMaterial( {color: 0xff0000} );
 
     let smallBalls = new Set();
 
@@ -110,14 +124,23 @@ class Initializer {
       total++;
       let currBall = new Set();
       let intersect = false;
+      let addPoints = 0;
 
       if (numCurrRound == 0) {
-        if (thisObj.intersect(ball)) intersect = true;
+        let intersected = thisObj.intersect(ball);
+        if (intersected[0]) {
+          intersect = true;
+          if (intersected[1]) addPoints += MAX_POINTS;
+          addPoints += MAX_POINTS;
+        }
       } else {
         for (let b of smallBalls) {
-          if (thisObj.intersect(b)) {
+          let intersected = thisObj.intersect(b);
+          if (intersected[0]) {
             currBall.add(b);
             intersect = true;
+            if (intersected[1]) addPoints += MAX_POINTS;
+            addPoints += MAX_POINTS;
           }
         }
         // console.log("check small balls");
@@ -127,15 +150,19 @@ class Initializer {
         audio.play();
         let el = document.getElementById("points");
         let currScore = parseInt(el.innerHTML);
-        el.innerHTML = currScore + 2;
+        el.innerHTML = currScore + addPoints;
         let accuracy = (100*(++num_hit) / total).toFixed(2);
         el = document.getElementById("accuracy");
         el.innerHTML = accuracy;
         scene.remove(ball);
         numCurrRound++;
 
-        let numIntersect = currBall.size;
-        if (numIntersect > 1) numCurrRound += (numIntersect-1);
+        // console.log(currBall);
+        // console.log(currBall.size);
+        let size = currBall.size;
+        if (size != 0) numCurrRound += (currBall.size-1);
+
+        console.log("curr round: " + numCurrRound);
 
         // console.log("curr round: " + currRound + " num in curr round: " + numCurrRound);
 
@@ -151,14 +178,14 @@ class Initializer {
             numCurrRound = 0;
             if (currRound == TOTAL) {
               console.log("GAME OVERR");
-              currRound = 0;
-              numCurrRound = 0;
+              // currRound = 0;
+              // numCurrRound = 0;
               // potentially set up other things for new game
             }
             // new big sphere of radius 1
             ball = thisObj.makeNewBigBall();
             // ball.position.set(Math.random()*10, Math.random()*5+1, Math.random()*10);
-            ball.position.set(2, Math.random()*4+5, Math.random());
+            ball.position.set(2, Math.random()*4+2, 0);
             scene.add(ball);          
           } 
         }
@@ -224,11 +251,12 @@ class Initializer {
     plane.receiveShadow = true;
     plane.rotation.x = -Math.PI / 2;
     this.scene_.add(plane);
-    this.scene_.background = new Color(0x01c0ee);
+    // this.scene_.background = new Color(0x01c0ee);
+    this.scene_.background = new Color(0xadd8e6);
 
     const box = new THREE.Mesh(
       new THREE.BoxGeometry(8, 8, 4),
-      new THREE.MeshBasicMaterial( { color: 0x008B8B } ));
+      new THREE.MeshPhongMaterial( { color: 0x008B8B } ));
     box.position.set(10, 2, 0);
     box.castShadow = true;
     box.receiveShadow = true;
@@ -236,12 +264,12 @@ class Initializer {
 
     const box2 = new THREE.Mesh(
       new THREE.BoxGeometry(8, 8, 4),
-      new THREE.MeshBasicMaterial( { color: 0x008B8B } ));
+      new THREE.MeshPhongMaterial( { color: 0x008B8B } ));
     box2.position.set(-10, 2, 0);
     box2.castShadow = true;
     box2.receiveShadow = true;
     this.scene_.add(box2);
-    const concreteMaterial = new THREE.MeshBasicMaterial( { color: 'grey' } );
+    const concreteMaterial = new THREE.MeshPhongMaterial( { color: 'grey' } );
 
     const wall1 = new THREE.Mesh(
       new THREE.BoxGeometry(100, 100, 4),
@@ -393,7 +421,7 @@ function init_scoreBoard() {
   el.style.top = 15+'px'; // style='position: absolute; left:'50'%; top='15'px;
   
   el = document.getElementById("score");
-  el.style.backgroundColor = "green";
+  el.style.backgroundColor = "DarkCyan";
   el.style.color = "white";
   el.style.fontFamily = "courier";
   el.style.fontSize = 150+"%"
@@ -406,7 +434,7 @@ function init_scoreBoard() {
   el.style.left = -180+'px';
   el.style.top = 15+'px';
   el = document.getElementById("points");
-  el.style.backgroundColor = "green";
+  el.style.backgroundColor = "DarkCyan";
   el.style.color = "white";
   el.style.fontFamily = "courier";
   el.style.fontSize = 150+"%";
@@ -419,7 +447,7 @@ function init_scoreBoard() {
   el.style.top = 15+'px';
   el = document.getElementById("accuracy");
   el.style.backgroundColor = "white";
-  el.style.color = "green";
+  el.style.color = "DarkCyan";
   el.style.fontFamily = "courier";
   el.style.fontSize = 150+"%"
   el.style.position = "absolute";
@@ -431,7 +459,7 @@ function init_scoreBoard() {
   el.style.top = 15+'px';
   el = document.getElementById("percent");
   el.style.backgroundColor = "white";
-  el.style.color = "green";
+  el.style.color = "DarkCyan";
   el.style.fontFamily = "courier";
   el.style.fontSize = 150+"%";
   el.style.opacity = 0.6;    
