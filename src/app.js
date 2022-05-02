@@ -5,6 +5,9 @@ import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonCont
 import { fpsCamera } from './components/camera';
 import { Vector3, Vector2, Raycaster } from 'three';
 
+const NUM_SPLIT = 4;
+const TOTAL = 5;
+
 class Initializer {
   constructor() {
     this.initialize_();
@@ -21,15 +24,74 @@ class Initializer {
     this.raf_();
   }
 
-  initializeRandom_() {
-    const geometry = new THREE.SphereGeometry(); // (radius, widthSegments, heightSegments)
+  intersect (ball) {
+    this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    this.raycaster.setFromCamera(this.mouse, this.camera_);
+    const instersection = this.raycaster.intersectObject(ball, false);
+
+    if (instersection[0] != undefined) {
+      if (instersection[0].object.uuid === ball.uuid) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  makeNewBigBall() {
+    const BIG_R = 1;
+
+    const geometry = new THREE.SphereGeometry(BIG_R, 64, 32);
     const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-    var sphere = new THREE.Mesh(geometry, material);
-    sphere.position.set(3, 2, 0);
-    this.scene_.add(sphere);
-    let ball = sphere;
-    const raycaster = new Raycaster();
-    const mouse = new Vector2(0, 0);
+    let newBall = new THREE.Mesh(geometry, material);
+
+    return newBall;
+  } 
+
+  breakBigBall(bigBall) {
+    const SMALL_R = 0.25;
+    const x = bigBall.position.x;
+    const y = bigBall.position.y;
+    const z = bigBall.position.z;
+    const offset = SMALL_R*1.5;
+    const posX = x + offset;
+    const negX = x - offset;
+    const posY = y + offset;
+    const negY = y - offset;
+
+    let pos = [];
+    pos[0] = [posX, posY, z];
+    pos[1] = [posX, negY, z];
+    pos[2] = [negX, posY, z];
+    pos[3] = [negX, negY, z];
+
+    const geometry = new THREE.SphereGeometry(SMALL_R, 64, 32);
+    const material = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+
+    let smallBalls = new Set();
+
+    for (let i = 0; i < NUM_SPLIT; i++) {
+      let newBall = new THREE.Mesh(geometry, material);
+      newBall.position.set(pos[i][0], pos[i][1], pos[i][2]);
+      smallBalls.add(newBall);
+    }
+
+    return smallBalls;
+  }
+
+  endGame() {
+    // show an HTML thing that says like GOOD JOB ur accuracy is
+    // press enter to start again
+  } 
+
+  initializeRandom_() {
+    let ball = this.makeNewBigBall();
+    ball.position.set(2, 5, 0);
+    this.scene_.add(ball);
+    let smallBalls = new Set();
+    this.raycaster = new Raycaster();
+    this.mouse = new Vector2(0, 0);
     // console.log(this.camera_);
     // console.log(this.scene_);
     let cam = this.camera_;
@@ -39,27 +101,67 @@ class Initializer {
     let total = 0;
     // let audio = new Audio('src/resources/break.mp3');
     let audio = new Audio('src/resources/break2.mp3');
+    let thisObj = this;
+
+    let currRound = 0;
+    let numCurrRound = 0;
 
     window.addEventListener('click', function(event) {
       total++;
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      raycaster.setFromCamera(mouse, cam);
-      const instersections = raycaster.intersectObject(ball, false);
-      if (instersections[0] != undefined) {
-          if (instersections[0].object.uuid === sphere.uuid) {
-              audio.play();
-              let el = document.getElementById("points");
-              let currScore = parseInt(el.innerHTML);
-              el.innerHTML = ++currScore;
-              let accuracy = (100*(++num_hit) / total).toFixed(2);
-              el = document.getElementById("accuracy");
-              el.innerHTML = accuracy;
-              scene.remove(sphere);
-              sphere.position.set(Math.random()*10, Math.random()*5, Math.random()*10); 
-              scene.add(sphere);
-              ball = sphere;
+      let currBall = new Set();
+      let intersect = false;
+
+      if (numCurrRound == 0) {
+        if (thisObj.intersect(ball)) intersect = true;
+      } else {
+        for (let b of smallBalls) {
+          if (thisObj.intersect(b)) {
+            currBall.add(b);
+            intersect = true;
           }
+        }
+        // console.log("check small balls");
+      }
+
+      if (intersect) {
+        audio.play();
+        let el = document.getElementById("points");
+        let currScore = parseInt(el.innerHTML);
+        el.innerHTML = currScore + 2;
+        let accuracy = (100*(++num_hit) / total).toFixed(2);
+        el = document.getElementById("accuracy");
+        el.innerHTML = accuracy;
+        scene.remove(ball);
+        numCurrRound++;
+
+        let numIntersect = currBall.size;
+        if (numIntersect > 1) numCurrRound += (numIntersect-1);
+
+        // console.log("curr round: " + currRound + " num in curr round: " + numCurrRound);
+
+        if (numCurrRound == 1) {
+          smallBalls = thisObj.breakBigBall(ball);  
+          for (let b of smallBalls) scene.add(b);
+          ball = null;
+          // console.log("4 small");
+        } else {
+          for (let b of currBall) scene.remove(b);
+          if (numCurrRound == (NUM_SPLIT+1)) {
+            currRound++;
+            numCurrRound = 0;
+            if (currRound == TOTAL) {
+              console.log("GAME OVERR");
+              currRound = 0;
+              numCurrRound = 0;
+              // potentially set up other things for new game
+            }
+            // new big sphere of radius 1
+            ball = thisObj.makeNewBigBall();
+            // ball.position.set(Math.random()*10, Math.random()*5+1, Math.random()*10);
+            ball.position.set(2, Math.random()*4+5, Math.random());
+            scene.add(ball);          
+          } 
+        }
       } else {
         let accuracy = (100 * num_hit / total).toFixed(2);
         let el = document.getElementById("accuracy");
@@ -67,7 +169,6 @@ class Initializer {
       }
     });
   }
-
 
   initializeController_() {
     this.controls_ = new FirstPersonControls(
@@ -263,7 +364,7 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Move: WASD, Jump: SPACE, Look: MOUSE</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Move: WASD, Look: MOUSE</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Shoot: LEFT CLICK</span></div> \
@@ -277,6 +378,7 @@ const div = document.createElement("div");
 div.id = "startDiv";
 div.innerHTML = html;
 document.body.appendChild(div);
+document.getElementsByTagName("body")[0].style.margin = '0px';
 
 function init_scoreBoard() {
   // let html = " <div id='score'>Score: 0 <br> Accuracy: -- %</div>";
@@ -343,7 +445,6 @@ function init_scoreBoard() {
 }
 
 let _APP = null;
-
 
 window.addEventListener("keydown", event => { 
   if (event.key == "Enter") {
