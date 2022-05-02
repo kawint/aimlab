@@ -6,10 +6,11 @@ import { fpsCamera } from './components/camera';
 import { Vector3, Vector2, Raycaster } from 'three';
 
 const NUM_SPLIT = 4;
-const TOTAL = 5;
-const MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
+var TOTAL = 1;
+var MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
 const THIRTY_DEG = Math.PI/6;
 var END = false;
+var ANIMATE_END = false;
 
 class Initializer {
   constructor() {
@@ -31,7 +32,7 @@ class Initializer {
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     this.raycaster.setFromCamera(this.mouse, this.camera_);
-    console.log(this.raycaster.layers);
+    // console.log(this.raycaster.layers);
     const instersection = this.raycaster.intersectObject(ball, false);
 
     if (instersection[0] != undefined) {
@@ -103,8 +104,9 @@ class Initializer {
   }
   endGame() {
     END = true;
-    console.log("GAME OVER");
-    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br>Press &ltEnter&gt to play again !! </div>";
+    ANIMATE_END = true;
+    // console.log("GAME OVER");
+    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "%<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br><span id='endEnter'>Press &ltEnter&gt to play again !!</span> </div>";
     let div = document.createElement("div");
     div.innerHTML = html;
     document.body.appendChild(div);
@@ -128,12 +130,11 @@ class Initializer {
     el = document.getElementById("top");
     el.remove();
     enter = true;
-  } 
-
+  }
 
   initializeRandom_() {
     let ball = this.makeNewBigBall();
-    console.log(ball);
+    // console.log(ball);
     ball.position.set(2, 5, 0);
     this.scene_.add(ball);
     let smallBalls = new Set();
@@ -153,8 +154,9 @@ class Initializer {
     var currRound = 0;
     var numCurrRound = 0;
 
-    window.addEventListener('click', function(event) {
-      if (END) return;
+
+    window.addEventListener('click', function clickFunc(event) {
+      // if (END) return;
       thisObj.total++;
       let currBall = undefined;
       let minDist = undefined;      
@@ -206,7 +208,7 @@ class Initializer {
         // let size = currBall.size;
         // if (size != 0) numCurrRound += (currBall.size-1);
 
-        console.log("curr round: " + numCurrRound);
+        // console.log("curr round: " + numCurrRound);
 
         // console.log("curr round: " + currRound + " num in curr round: " + numCurrRound);
 
@@ -223,7 +225,10 @@ class Initializer {
           if (numCurrRound == (NUM_SPLIT+1)) {
             currRound++;
             numCurrRound = 0;
-            if (currRound == TOTAL) thisObj.endGame();
+            if (currRound == TOTAL) {
+              thisObj.endGame();
+              window.removeEventListener('click', clickFunc);
+            }
             else {
               // new big sphere of radius 1
               ball = thisObj.makeNewBigBall();
@@ -387,6 +392,13 @@ class Initializer {
     this.scene_.add(light);
   }
 
+  animateHTML(time) {
+  if (ANIMATE_END) {
+    let opac = 0.4 * Math.sin(time / 500) + 0.6;
+      document.getElementById('endEnter').style.opacity = opac;
+    }
+  }
+
   raf_() {
     requestAnimationFrame((t) => {
       if (this.previousRAF_ === null) {
@@ -399,6 +411,7 @@ class Initializer {
       this.threejs_.autoClear = false;
       this.threejs_.render(this.uiScene_, this.uiCamera_);
       this.previousRAF_ = t;
+      this.animateHTML(t);
       this.raf_();
     });
   }
@@ -433,24 +446,41 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>AIM LAB</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Move: WASD, Look: MOUSE</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; '>Move: WASD, Look: MOUSE</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-style: italic;'>Shoot: LEFT CLICK</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Shoot: LEFT CLICK</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-weight: bold;'>INSTRUCTIONS:</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>stuff explaining the game...</span></div> \
+<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Enter the number of rounds u want!</span></div> \
+<div style='background:DarkCyan;text-align: center;'><input id='num'></input></div> \
+<div style='background:DarkCyan;text-align: center;'><span id='error' style='color:red;font-size:6em; font-weight: bold;'></span></div> \
+<div style='background:DarkCyan;text-align: center;'><span id ='startEnter' style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
 <div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray;margin=0px;height=1000px'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 </div>"
+
+
 const startDiv = document.createElement("div");
 startDiv.id = "startDiv";
 startDiv.innerHTML = html;
 document.body.appendChild(startDiv);
 document.getElementsByTagName("body")[0].style.margin = '0px';
+
+var time = 0;
+function loop() {
+  let opac = 0.4 * Math.sin(time / 100) + 0.6;
+  document.getElementById('startEnter').style.opacity = opac;
+  time++;
+}
+var startLoop = window.setInterval(loop, 1);
+
 
 function init_scoreBoard() {
   // let html = " <div id='score'>Score: 0 <br> Accuracy: -- %</div>";
@@ -522,13 +552,24 @@ let enter = true;
 window.addEventListener("keydown", event => { 
   if (enter) {
     if (event.key == "Enter") {
-      init_scoreBoard();
+      
       if (END) {
+        ANIMATE_END = false;
+        init_scoreBoard();
         document.getElementById("end").remove();
         _APP.initializeRandom_();
-
-      } else {
-        startDiv.remove();        
+      } else {   
+        let el = document.getElementById("num");
+        TOTAL = parseInt(el.value);
+        if (isNaN(TOTAL)) {
+          el = document.getElementById("error");
+          error.innerHTML = "ERROR";
+          return;
+        }
+        MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
+        startDiv.remove();  
+        init_scoreBoard();
+        clearTimeout(startLoop);
         _APP = new Initializer();
       }
 
