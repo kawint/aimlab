@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Scene, Color } from 'three';
+import { Color } from 'three';
 
 import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
 import { fpsCamera } from './components/camera';
