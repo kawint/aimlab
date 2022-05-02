@@ -6,7 +6,7 @@ import { fpsCamera } from './components/camera';
 import { Vector3, Vector2, Raycaster } from 'three';
 
 const NUM_SPLIT = 4;
-const TOTAL = 2;
+const TOTAL = 5;
 const MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
 const THIRTY_DEG = Math.PI/6;
 var END = false;
@@ -104,7 +104,7 @@ class Initializer {
   endGame() {
     END = true;
     console.log("GAME OVER");
-    let html = " <div id='end'> GAME OVER! <br> ACCURACY: " + this.getAccuracy()  + "% <br> SCORE: "  +  this.getPoints()+ " PTS <br> Press &ltEnter&gt to play again !! </div>";
+    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br>Press &ltEnter&gt to play again !! </div>";
     let div = document.createElement("div");
     div.innerHTML = html;
     document.body.appendChild(div);
@@ -122,17 +122,18 @@ class Initializer {
     el.style.fontSize = 150+"%"
     el.style.width = width+'px';
     el.style.height = height+'px';
-    // el.style.lineHeight = 150+'%';
+    // el.style.lineHeight = height+'px';
     el.style.textAlign = "center";
-    el.className = "center";
 
     el = document.getElementById("top");
     el.remove();
     enter = true;
   } 
 
+
   initializeRandom_() {
     let ball = this.makeNewBigBall();
+    console.log(ball);
     ball.position.set(2, 5, 0);
     this.scene_.add(ball);
     let smallBalls = new Set();
