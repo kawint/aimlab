@@ -9,10 +9,7 @@ const NUM_SPLIT = 4;
 const TOTAL = 2;
 const MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
 const THIRTY_DEG = Math.PI/6;
-
-// TODO
-// 1) add instructions to start page
-// 2) update the ball generation position based on obstacle position
+var END = false;
 
 class Initializer {
   constructor() {
@@ -34,10 +31,12 @@ class Initializer {
     this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     this.raycaster.setFromCamera(this.mouse, this.camera_);
+    console.log(this.raycaster.layers);
     const instersection = this.raycaster.intersectObject(ball, false);
 
     if (instersection[0] != undefined) {
       if (instersection[0].object.uuid === ball.uuid) {
+        let dist = instersection[0].distance;
         let camPos = this.camera_.position;
         let interPos = instersection[0].point;
         let center = ball.position;
@@ -45,8 +44,8 @@ class Initializer {
         let toCam = new THREE.Vector3().copy(camPos).sub(ball.position).normalize();
         let toInter = new THREE.Vector3().copy(interPos).sub(ball.position).normalize();
     
-        if (Math.acos(toCam.dot(toInter)) < THIRTY_DEG) return [true, true];
-        return [true, false];
+        if (Math.acos(toCam.dot(toInter)) < THIRTY_DEG) return [true, true, dist];
+        return [true, false, dist];
       }
     }
 
@@ -94,9 +93,42 @@ class Initializer {
     return smallBalls;
   }
 
+  getPoints() {
+    let el = document.getElementById("points");
+    return parseInt(el.innerHTML);
+  }
+
+  getAccuracy() {
+    return (100 * this.num_hit / this.total).toFixed(2);
+  }
   endGame() {
-    // show an HTML thing that says like GOOD JOB ur accuracy is
-    // press enter to start again
+    END = true;
+    console.log("GAME OVER");
+    let html = " <div id='end'> GAME OVER! <br> ACCURACY: " + this.getAccuracy()  + "% <br> SCORE: "  +  this.getPoints()+ " PTS <br> Press &ltEnter&gt to play again !! </div>";
+    let div = document.createElement("div");
+    div.innerHTML = html;
+    document.body.appendChild(div);
+
+    const height = window.innerHeight / 2;
+    const width = window.innerWidth / 2;
+
+    let el = document.getElementById("end");
+    el.style.position = "absolute";
+    el.style.left = (width-width/2) + 'px';
+    el.style.top = (height-height/2)+'px'; 
+    el.style.backgroundColor = "DarkCyan";
+    el.style.color = "white";
+    el.style.fontFamily = "courier";
+    el.style.fontSize = 150+"%"
+    el.style.width = width+'px';
+    el.style.height = height+'px';
+    // el.style.lineHeight = 150+'%';
+    el.style.textAlign = "center";
+    el.className = "center";
+
+    el = document.getElementById("top");
+    el.remove();
+    enter = true;
   } 
 
   initializeRandom_() {
@@ -111,18 +143,20 @@ class Initializer {
     let cam = this.camera_;
     let scene = this.scene_;
 
-    let num_hit = 0;
-    let total = 0;
+    this.num_hit = 0;
+    this.total = 0;
     // let audio = new Audio('src/resources/break.mp3');
     let audio = new Audio('src/resources/break2.mp3');
     let thisObj = this;
 
-    let currRound = 0;
-    let numCurrRound = 0;
+    var currRound = 0;
+    var numCurrRound = 0;
 
     window.addEventListener('click', function(event) {
-      total++;
-      let currBall = new Set();
+      if (END) return;
+      thisObj.total++;
+      let currBall = undefined;
+      let minDist = undefined;      
       let intersect = false;
       let addPoints = 0;
 
@@ -137,10 +171,19 @@ class Initializer {
         for (let b of smallBalls) {
           let intersected = thisObj.intersect(b);
           if (intersected[0]) {
-            currBall.add(b);
-            intersect = true;
-            if (intersected[1]) addPoints += MAX_POINTS;
-            addPoints += MAX_POINTS;
+            if (!intersect) {
+              minDist = intersected[2];
+              currBall = b;
+              if (intersected[1]) addPoints += MAX_POINTS;
+              addPoints += MAX_POINTS;
+              intersect = true;
+            } else if (intersected[2] < minDist) {
+              addPoints = 0;
+              minDist = intersected[2];
+              currBall = b;
+              if (intersected[1]) addPoints += MAX_POINTS;
+              addPoints += MAX_POINTS;
+            }
           }
         }
         // console.log("check small balls");
@@ -149,9 +192,9 @@ class Initializer {
       if (intersect) {
         audio.play();
         let el = document.getElementById("points");
-        let currScore = parseInt(el.innerHTML);
+        let currScore = thisObj.getPoints();
         el.innerHTML = currScore + addPoints;
-        let accuracy = (100*(++num_hit) / total).toFixed(2);
+        let accuracy = (100*(++thisObj.num_hit) / thisObj.total).toFixed(2);
         el = document.getElementById("accuracy");
         el.innerHTML = accuracy;
         scene.remove(ball);
@@ -159,8 +202,8 @@ class Initializer {
 
         // console.log(currBall);
         // console.log(currBall.size);
-        let size = currBall.size;
-        if (size != 0) numCurrRound += (currBall.size-1);
+        // let size = currBall.size;
+        // if (size != 0) numCurrRound += (currBall.size-1);
 
         console.log("curr round: " + numCurrRound);
 
@@ -172,25 +215,25 @@ class Initializer {
           ball = null;
           // console.log("4 small");
         } else {
-          for (let b of currBall) scene.remove(b);
+          // for (let b of currBall) {
+            scene.remove(currBall);
+            smallBalls.delete(currBall);
+          // }
           if (numCurrRound == (NUM_SPLIT+1)) {
             currRound++;
             numCurrRound = 0;
-            if (currRound == TOTAL) {
-              console.log("GAME OVERR");
-              // currRound = 0;
-              // numCurrRound = 0;
-              // potentially set up other things for new game
-            }
-            // new big sphere of radius 1
-            ball = thisObj.makeNewBigBall();
-            // ball.position.set(Math.random()*10, Math.random()*5+1, Math.random()*10);
-            ball.position.set(2, Math.random()*4+2, 0);
-            scene.add(ball);          
+            if (currRound == TOTAL) thisObj.endGame();
+            else {
+              // new big sphere of radius 1
+              ball = thisObj.makeNewBigBall();
+              // ball.position.set(Math.random()*10, Math.random()*5+1, Math.random()*10);
+              ball.position.set(2, Math.random()*4+2, 0);
+              scene.add(ball);   
+            }       
           } 
         }
       } else {
-        let accuracy = (100 * num_hit / total).toFixed(2);
+        let accuracy = thisObj.getAccuracy();
         let el = document.getElementById("accuracy");
         el.innerHTML = accuracy;
       }
@@ -384,7 +427,7 @@ class Initializer {
 // old font: Montserrat -- I changed the font to match the scoreboard but I don't care what font we use haha
 let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
 <link href='https://fonts.googleapis.com/css2?family=courier:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'> <div id='instructions'> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray;'><br/></div>\
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>AIM LAB</span></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
@@ -400,12 +443,12 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
 <div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
 <div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<div style='background-color:DarkCyan;color:lightgray;margin=0px;height=1000px'><br/></div>\
 </div>"
-const div = document.createElement("div");
-div.id = "startDiv";
-div.innerHTML = html;
-document.body.appendChild(div);
+const startDiv = document.createElement("div");
+startDiv.id = "startDiv";
+startDiv.innerHTML = html;
+document.body.appendChild(startDiv);
 document.getElementsByTagName("body")[0].style.margin = '0px';
 
 function init_scoreBoard() {
@@ -473,12 +516,23 @@ function init_scoreBoard() {
 }
 
 let _APP = null;
+let enter = true;
 
 window.addEventListener("keydown", event => { 
-  if (event.key == "Enter") {
-    div.remove();
-    init_scoreBoard();
-    _APP = new Initializer();
-    // box_stuff();
+  if (enter) {
+    if (event.key == "Enter") {
+      init_scoreBoard();
+      if (END) {
+        document.getElementById("end").remove();
+        _APP.initializeRandom_();
+
+      } else {
+        startDiv.remove();        
+        _APP = new Initializer();
+      }
+
+      END = false;
+      enter = false;
+    }
   }
 });
