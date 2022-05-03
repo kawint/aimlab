@@ -106,7 +106,7 @@ class Initializer {
     END = true;
     ANIMATE_END = true;
     // console.log("GAME OVER");
-    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "%<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br><span id='endEnter'>Press &ltEnter&gt to play again !!</span> </div>";
+    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "%<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br><span id='endEnter'>Press &ltEnter&gt to play again!</span> </div>";
     let div = document.createElement("div");
     div.innerHTML = html;
     document.body.appendChild(div);
@@ -196,7 +196,7 @@ class Initializer {
         audio.play();
         let el = document.getElementById("points");
         let currScore = thisObj.getPoints();
-        el.innerHTML = currScore + addPoints;
+        el.innerHTML = Math.round(currScore + addPoints);
         let accuracy = (100*(++thisObj.num_hit) / thisObj.total).toFixed(2);
         el = document.getElementById("accuracy");
         el.innerHTML = accuracy;
@@ -233,7 +233,7 @@ class Initializer {
               // new big sphere of radius 1
               ball = thisObj.makeNewBigBall();
               // ball.position.set(Math.random()*10, Math.random()*5+1, Math.random()*10);
-              ball.position.set(2, Math.random()*4+2, 0);
+              ball.position.set(Math.random()*10-5, Math.random()*5+1, Math.random()*10-5);
               scene.add(ball);   
             }       
           } 
@@ -440,31 +440,30 @@ class Initializer {
 
 // old font: Montserrat -- I changed the font to match the scoreboard but I don't care what font we use haha
 let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
-<link href='https://fonts.googleapis.com/css2?family=courier:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'> <div id='instructions'> \
-<div style='background-color:DarkCyan;color:lightgray;'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>AIM LAB</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; '>Move: WASD, Look: MOUSE</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Shoot: LEFT CLICK</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-weight: bold;'>INSTRUCTIONS:</span></div> \
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>stuff explaining the game...</span></div> \
-<div style='background:DarkCyan;text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Enter the number of rounds u want!</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><input id='num' style='height:25px; width:50px;border: 3px solid; border-radius: 10px; font-size:1.5em; font-family: courier, sans-serif;'></input></div> \
-<div style='background:DarkCyan;text-align: center;'><span id='error' style='color:red;font-size:6em; font-weight: bold;'></span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><span id ='startEnter' style='font-size:2em; font-weight: bold; font-family: courier, sans-serif; font-style: italic;'>Press &ltEnter&gt to play !!</span></div> \
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
-<div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
-<div style='background-color:DarkCyan;color:lightgray;margin=0px;height=1000px'><br/></div>\
-<div style='background-color:DarkCyan;color:lightgray'><br/></div>\
+<link href='https://fonts.googleapis.com/css2?family=courier:ital,wght@1,100;1,300&family=Poppins&display=swap' rel='stylesheet'>\
+<div id='instructions' style='background-color:DarkCyan; background-image: linear-gradient(135deg, DarkCyan, Cyan);position:absolute; right:0px; left:0px; top:0px; bottom:0px;'> \
+  <div style='text-align: center;margin-top:100px;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif;'><img src='./src/aim.ico'width=70; height=70;> Aim Lab</span></div> \
+  <div style='text-align: center;'><span style='font-size:3em; font-family: courier, sans-serif;'>Practice your aim!</span></div> \
+  <div><br/></div>\
+  <div ><br/></div>\
+  <div id='ball' style='background:clear; position:absolute;'><img src='./src/ball.png'; width=164; height=137;></div> \
+  <div><br/></div>\
+  <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-weight: bold;'>INSTRUCTIONS:</span></div> \
+  <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; '>Move: WASD, Look: MOUSE</span></div> \
+  <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Shoot: LEFT CLICK</span></div> \
+  <div><br/></div>\
+  <div style='text-align: center;'><span style='font-size:1.5em; font-weight: 300; font-family: courier, sans-serif;'>Each round consists of shooting five balls. <br> Shoot within half the radius for maximum points. <br> Try to get the maximum of 100 pts and 100% accuracy!</span></div>\
+  <div style='text-align: center;'><span style='font-size:1.5em; font-weight: 300; font-family: courier, sans-serif;'><br>Choose the number of rounds below:</span></div> \
+  <div style='color:lightgray'><br/></div>\
+  <div style='text-align: center;'><input id='num' style='height:25px; width:50px;border: 3px solid; border-radius: 10px; font-size:1.5em; font-family: courier, sans-serif;'></input></div> \
+  <div style='color:lightgray'><br/></div>\
+  <div style='text-align: center;'><span id='error' style='color:red;font-size:1.5em; font-family: courier, sans-serif;'></span></div> \
+  <div><br/></div>\
+  <div style='text-align: center;'><span id ='startEnter' style='font-size:2em; font-weight: bold; font-family: courier, sans-serif;'>Press &ltEnter&gt to play!</span></div> \
+  <div id='ball2' style='background:clear; position:absolute;'><img src='./src/ball.png'; width=164; height=137;></div> \
 </div>"
 
+// <div style='background:DarkCyan;text-align: center;'><img src='./src/aimlab.jpeg' width='800' height='480'></div> \
 
 const startDiv = document.createElement("div");
 startDiv.id = "startDiv";
@@ -473,10 +472,23 @@ document.body.appendChild(startDiv);
 document.getElementsByTagName("body")[0].style.margin = '0px';
 
 var time = 0;
+var time2 = 0;
 function loop() {
   let opac = 0.4 * Math.sin(time / 100) + 0.6;
   document.getElementById('startEnter').style.opacity = opac;
+  let right = 60+time2;
+  if (right > window.innerWidth + 100) {
+    right = 60;
+    time2 = 0 - time % 100;
+  }
+  document.getElementById('ball').style.left = (right - 100)+'px'; 
+  document.getElementById('ball').style.top =(300*opac-30)+'px';
+
+  document.getElementById('ball2').style.right = (right - 100)+'px'; 
+  document.getElementById('ball2').style.top =(300*opac+500)+'px';
+
   time++;
+  time2++;
 }
 var startLoop = window.setInterval(loop, 1);
 
@@ -560,9 +572,9 @@ window.addEventListener("keydown", event => {
       } else {   
         let el = document.getElementById("num");
         TOTAL = parseInt(el.value);
-        if (isNaN(TOTAL)) {
+        if (isNaN(TOTAL) || TOTAL <= 0) {
           el = document.getElementById("error");
-          error.innerHTML = "ERROR";
+          error.innerHTML = "Please input a positive number.";
           return;
         }
         MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
