@@ -4,6 +4,7 @@ import { Color } from 'three';
 import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
 import { fpsCamera } from './components/camera';
 import { Vector3, Vector2, Raycaster } from 'three';
+import { Mouse } from './components/mouse';
 
 const NUM_SPLIT = 4;
 var TOTAL = 1;
@@ -163,6 +164,16 @@ class Initializer {
     var currRound = 0;
     var numCurrRound = 0;
 
+    window.addEventListener('mousemove', function(event) {
+      let x = event.pageX;
+      let y = event.pageY;
+
+      let img = document.getElementById("crosshair");
+      img.style.left = (x-25) + 'px';
+      img.style.top = (y-25) + 'px'; 
+      img.style.opacity = 1;
+      img.style.cursor = "none";
+    });
 
     window.addEventListener('click', function clickFunc(event) {
       // if (END) return;
@@ -456,7 +467,6 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
   <div style='text-align: center;margin-top:100px;'><span style='font-size:6em; font-weight: bold; font-family: courier, sans-serif;'><img src='./src/aim.ico'width=70; height=70;> Aim Lab</span></div> \
   <div style='text-align: center;'><span style='font-size:3em; font-family: courier, sans-serif;'>Practice your aim!</span></div> \
   <div><br/></div>\
-  <div ><br/></div>\
   <div id='ball' style='background:clear; position:absolute;'><img src='./src/ball.png'; width=164; height=137;></div> \
   <div><br/></div>\
   <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; font-weight: bold;'>INSTRUCTIONS:</span></div> \
@@ -506,7 +516,8 @@ var startLoop = window.setInterval(loop, 1);
 
 function init_scoreBoard() {
   // let html = " <div id='score'>Score: 0 <br> Accuracy: -- %</div>";
-  let html = " <div id='top'><div id='score'>PTS</div><div id='points'>0</div><div id='accuracy'> -- </div><div id='percent'>%</div></div>";
+  let html = " <div><img id='crosshair' style='position:absolute;opacity:0;'src='./src/crosshair.png'; width=50; height=50; ></div>\
+  <div id='top'><div id='score'>PTS</div><div id='points'>0</div><div id='accuracy'> -- </div><div id='percent'>%</div></div>";
   let div = document.createElement("div");
   div.innerHTML = html;
   document.body.appendChild(div);
