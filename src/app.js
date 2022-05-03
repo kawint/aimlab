@@ -11,6 +11,8 @@ var MAX_POINTS = 100/((NUM_SPLIT+1)*TOTAL*2);
 const THIRTY_DEG = Math.PI/6;
 var END = false;
 var ANIMATE_END = false;
+var START_TIME;
+var END_TIME;
 
 class Initializer {
   constructor() {
@@ -106,7 +108,12 @@ class Initializer {
     END = true;
     ANIMATE_END = true;
     // console.log("GAME OVER");
-    let html = " <div id='end'> <br><br><br><br>GAME OVER! <br><br><br> ACCURACY: " + this.getAccuracy()  + "%<br>SCORE: "  +  this.getPoints()+ "/100 PTS  <br><br><br><br><br><span id='endEnter'>Press &ltEnter&gt to play again!</span> </div>";
+    let totTime = ((END_TIME-START_TIME)/1000).toFixed(2);
+    let html = " <div id='end'> <br><br><br>GAME OVER! <br><br><br>\
+    ACCURACY: " + this.getAccuracy()  + "%<br>\
+    SCORE: "  +  this.getPoints()+ "/100 PTS <br>\
+    TIME: " + totTime + " SECONDS <br>\
+    <br><br><span id='endEnter'>Press &ltEnter&gt to play again!</span> </div>";
     let div = document.createElement("div");
     div.innerHTML = html;
     document.body.appendChild(div);
@@ -137,6 +144,8 @@ class Initializer {
     // console.log(ball);
     ball.position.set(2, 5, 0);
     this.scene_.add(ball);
+    const s = new Date();
+    START_TIME = s.getTime();
     let smallBalls = new Set();
     this.raycaster = new Raycaster();
     this.mouse = new Vector2(0, 0);
@@ -226,6 +235,8 @@ class Initializer {
             currRound++;
             numCurrRound = 0;
             if (currRound == TOTAL) {
+              const e = new Date();
+              END_TIME = e.getTime();
               thisObj.endGame();
               window.removeEventListener('click', clickFunc);
             }
@@ -452,7 +463,7 @@ let html = "<link rel='preconnect' href='ht tps://fonts.gstatic.com'> \
   <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif; '>Move: WASD, Look: MOUSE</span></div> \
   <div style='text-align: center;'><span style='font-size:2em; font-weight: 300; font-family: courier, sans-serif;'>Shoot: LEFT CLICK</span></div> \
   <div><br/></div>\
-  <div style='text-align: center;'><span style='font-size:1.5em; font-weight: 300; font-family: courier, sans-serif;'>Each round consists of shooting five balls. <br> Shoot within half the radius for maximum points. <br> Try to get the maximum of 100 pts and 100% accuracy!</span></div>\
+  <div style='text-align: center;'><span style='font-size:1.5em; font-weight: 300; font-family: courier, sans-serif;'>Each round consists of shooting five balls. <br> Shoot within half the radius for maximum points. <br> Try to get the maximum of 100 pts and 100% accuracy as fast as possible!</span></div>\
   <div style='text-align: center;'><span style='font-size:1.5em; font-weight: 300; font-family: courier, sans-serif;'><br>Choose the number of rounds below:</span></div> \
   <div style='color:lightgray'><br/></div>\
   <div style='text-align: center;'><input id='num' style='height:25px; width:50px;border: 3px solid; border-radius: 10px; font-size:1.5em; font-family: courier, sans-serif;'></input></div> \
